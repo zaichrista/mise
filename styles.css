@@ -171,7 +171,39 @@ button:not(:disabled):is(.chip, .quiet, .quiet-btn):active { background-color: v
 }
 .card:not(:disabled):active { transform: translateY(3px) scale(.99); box-shadow: 0 0 0 transparent; transition-duration: 60ms; }
 .servings { padding: 5px; border: 1px solid var(--line); border-radius: 40px; background: var(--soft); gap: 6px; }
-.servings .round { background: var(--paper); width: 48px; height: 48px; }
+.servings .round {
+  position: relative; isolation: isolate;
+  width: 48px; height: 48px;
+  background: transparent; border: 0; box-shadow: none;
+  /* Squish the cushion, keeping the full tap area still. */
+  transform: none; transition: none;
+}
+.servings .round::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  border: 1px solid var(--line); border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--paper), white 12%), var(--paper) 75%);
+  box-shadow: 0 4px 0 var(--line), 0 6px 9px #0000000a, inset 0 2px 2px #ffffff30;
+}
+.servings .round svg { position: relative; }
+.servings .round::before, .servings .round svg {
+  transform-origin: 50% 65%;
+  transition: transform 480ms cubic-bezier(.2, 1.65, .35, 1), box-shadow 120ms ease;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  .servings .round::before, .servings .round svg {
+    transition-timing-function: linear(0, .55 12%, 1.08 28%, 1.16 40%, 1.04 58%, .98 74%, 1), ease;
+  }
+}
+.servings button.round:not(:disabled):active { transform: none; box-shadow: none; }
+.servings .round:not(:disabled):active::before {
+  transform: translateY(4px) scale(1.1, .8);
+  box-shadow: 0 1px 0 var(--line), inset 0 2px 5px #00000012;
+  transition: transform 85ms ease-out, box-shadow 85ms ease-out;
+}
+.servings .round:not(:disabled):active svg {
+  transform: translateY(4px) scale(1.04, .85);
+  transition: transform 85ms ease-out;
+}
 .servings b { min-width: 114px; font-size: 17px; font-variant-numeric: tabular-nums; }
 .servings-value { display: inline-block; color: var(--accent); min-width: 2ch; }
 .row strong { display: inline-block; transform-origin: right center; font-variant-numeric: tabular-nums; }
@@ -247,6 +279,8 @@ button:not(:disabled):is(.chip, .quiet, .quiet-btn):active { background-color: v
 .timer-dial.just-started { animation: timer-settle 420ms ease-out; }
 .alert .eyebrow svg { transform-origin: 50% 15%; animation: bell-wiggle 650ms ease-in-out; }
 @media (prefers-reduced-motion: reduce) {
+  .servings .round::before, .servings .round svg { transition: none; }
+  .servings .round:not(:disabled):active::before, .servings .round:not(:disabled):active svg { transform: none; }
   .main, .soft, .round, .back, .chip, .quiet, .quiet-btn, .card, .card svg { transition: none; }
   button:not(:disabled):is(.main, .soft, .round, .back, .chip, .quiet, .quiet-btn, .card):active, .card:hover, .card:hover svg { transform: none; }
   .timer-dial.just-started, .alert .eyebrow svg { animation: none; }
