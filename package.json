@@ -8,7 +8,7 @@
     "build": "node scripts/build.mjs",
     "package": "npm run build && node scripts/package.mjs",
     "icons": "node scripts/generate-icons.mjs",
-    "check": "node --check app.js && node --check theme.js && node --check recipe.js && node --check import-recipe.mjs && node --check server.mjs && node --check pwa.js && node --check sw.js && node --check scripts/build.mjs && node --check scripts/package.mjs",
+    "check": "node --check app.js && node --check theme.js && node --check recipe.js && node --check recipe-import.js && node --check photos.js && node --check import-recipe.mjs && node --check server.mjs && node --check pwa.js && node --check sw.js && node --check scripts/build.mjs && node --check scripts/package.mjs",
     "test": "node --test test/"
   }
 }

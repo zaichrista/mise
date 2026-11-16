@@ -1,6 +1,6 @@
 # Deploy Pot & Page
 
-The important files are at the repository root: `index.html`, `styles.css`, `app.js`, `recipe.js`, `theme.js`, `app-config.js`, `pwa.js`, `manifest.webmanifest`, and the ready-to-serve `sw.js`. Keep `icons/` and `vendor/` alongside them. There is no enclosing project folder to move or unzip.
+The important files are at the repository root: `index.html`, `styles.css`, `app.js`, `recipe.js`, `recipe-import.js`, `photos.js`, `theme.js`, `app-config.js`, `pwa.js`, `manifest.webmanifest`, and the ready-to-serve `sw.js`. Keep `icons/` and `vendor/` alongside them. There is no enclosing project folder to move or unzip.
 
 ## Recommended: GitHub Actions
 
@@ -25,4 +25,4 @@ npm run build     # Refresh root sw.js and build dist/
 npm run package   # Build website and source ZIPs in release/
 ```
 
-GitHub Pages uses the static configuration: write/paste recipes, offline support, and home-screen installation. URL importing works through the optional local server only. Instructions for installing on phones and details about saved data are in [README.md](README.md).
+GitHub Pages uses the static configuration: recipe writing, saved HTML/JSON recipe imports, direct URL imports where the source permits browser access, local photo storage, offline support, and home-screen installation. Sites that block direct URL access require the optional local server or a separately configured import endpoint; see README.md. Instructions for installing on phones and details about saved data are in [README.md](README.md).

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 export const assets = [
-  'index.html', 'app-config.js', 'app.js', 'theme.js', 'recipe.js', 'styles.css', 'pwa.js',
+  'index.html', 'app-config.js', 'app.js', 'theme.js', 'recipe.js', 'recipe-import.js', 'photos.js', 'styles.css', 'pwa.js',
   'manifest.webmanifest', 'vendor/lucide.js', 'vendor/LUCIDE-LICENSE',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'

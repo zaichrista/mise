@@ -37,7 +37,7 @@ async function zip(name, base, files) {
 }
 await zip('pot-and-page-website.zip', resolve(root, 'dist'), await collect(resolve(root, 'dist')));
 // An explicit source allowlist excludes credentials, editor state and generated archives.
-const sourceFiles = ['.gitignore', '.nojekyll', 'README.md', 'DEPLOY.md', 'package.json', 'index.html', 'app-config.js', 'app.js', 'theme.js', 'recipe.js', 'styles.css', 'pwa.js', 'sw.js', 'manifest.webmanifest', 'server.mjs', 'import-recipe.mjs'];
+const sourceFiles = ['.gitignore', '.nojekyll', 'README.md', 'DEPLOY.md', 'package.json', 'index.html', 'app-config.js', 'app.js', 'theme.js', 'recipe.js', 'recipe-import.js', 'photos.js', 'styles.css', 'pwa.js', 'sw.js', 'manifest.webmanifest', 'server.mjs', 'import-recipe.mjs'];
 const sources = sourceFiles.map((file) => resolve(root, file));
 for (const directory of ['.github', 'scripts', 'icons', 'test', 'vendor', 'docs']) sources.push(...await collect(resolve(root, directory)));
 await zip('pot-and-page-source.zip', root, sources);

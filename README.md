@@ -1,6 +1,6 @@
 # Pot & Page
 
-A little joy in the kitchen. Save recipes, scale servings, and cook one step at a time with a big stopwatch-style timer. A responsive website and installable progressive web app, ready for GitHub Pages.
+A little joy in the kitchen. Save recipes and your own food photos, scale servings, and cook with ingredients on the left, vertically centred instructions on the right, and compact stopwatches at the top. A responsive website and installable progressive web app, ready for GitHub Pages.
 
 **Start here:** [Deploy to GitHub Pages](DEPLOY.md). The live app files and web-app metadata sit at the repository root, ready to serve. Supporting icons, vendor code, scripts, and tests stay in their own folders.
 
@@ -39,7 +39,15 @@ GitHub Pages requires a public repository on GitHub Free; private-repository Pag
 
 ### Recipe imports on static hosting
 
-GitHub Pages cannot run the Node importer. Production offers **Write a recipe** and **Paste a recipe** instead. Paste ingredients into the ingredient field and the method into a step; multiple pasted lines become separate steps. Local development keeps **Import from a link**. The static build does not send requests to a missing API or third-party proxy.
+**Import a recipe** is available on GitHub Pages as well as locally:
+
+- Paste a link. The static website fetches it directly if the recipe site allows cross-origin browser access. Many publishers block this, so it cannot work with every URL.
+- Upload a saved HTML recipe page or schema.org Recipe JSON file, or paste the page source. These are parsed on your device; page scripts never run. You can check and edit the result before saving it to your book.
+- When a link is blocked, save that recipe page as HTML in your browser and use the upload option. The site must include structured Recipe data; otherwise write or paste the ingredients and method into a new recipe.
+- For broad URL support, configure `importEndpoint` in `app-config.js` to a separately hosted importer with CORS enabled for your website. The expected response is `{ "ok": true, "recipe": { "title": "…", "ingredients": [], "steps": [], "image": "https://…" } }` or `{ "ok": false, "error": "…" }`. The endpoint receives a `url` query parameter. GitHub Pages itself cannot run this server.
+- `npm start` keeps the existing public-URL-only Node importer available automatically. The static website does not use an undisclosed third-party proxy.
+
+Imported recipe images are marked as internet photos. After cooking, you are prompted to replace an internet image or add a missing image with a photo of your own.
 
 ## Install as an app
 
@@ -53,7 +61,11 @@ After an online visit finishes caching the app, recipes, editing, serving calcul
 
 ## Data and timers
 
-Recipes, theme, cooking progress, and timer end times stay in browser localStorage. Original `mise-*` storage keys are preserved so this rename does not discard existing data on the same origin. Moving to another domain or browser does not transfer data. Clearing site data removes saved recipes. There is no account, cross-device sync, or recipe backup/export yet.
+Recipes, theme, cooking progress, and timer end times stay in browser localStorage. Photos you take or select from the photo library are resized (longest edge up to 1600px) and stored as image Blobs in IndexedDB on this device. They are not uploaded to a server and remain available offline.
+
+The recipe page and editor both offer **Take a photo** and **Photo library**. Supported phones open the rear camera for the camera action; other devices may open a file picker. Completion prompts appear only when no photo exists or the current image came from the internet. A photo you uploaded suppresses the prompt, including after reloading or editing the recipe. You can skip the prompt and enjoy the meal.
+
+Original `mise-*` storage keys are preserved so this rename does not discard existing data on the same origin. Moving to another domain or browser does not transfer data. Clearing site data removes saved recipes and photos. There is no account, cross-device sync, or recipe backup/export yet.
 
 Timers use saved end times and catch up when you return. Sound, vibration, and screen wake are browser/device dependent. A closed or suspended web app cannot guarantee a background timer alert; keep the app open for alerts. Read-aloud uses available browser speech voices and may depend on connectivity.
 
@@ -62,7 +74,9 @@ Timers use saved end times and catch up when you return. Sound, vibration, and s
 | File | Purpose |
 | --- | --- |
 | `app.js`, `styles.css` | Screens, playful kitchen illustrations, interactions and timers |
-| `recipe.js` | Recipe model, ingredient parser and serving calculations |
+| `recipe.js` | Recipe model, ingredient parser, serving calculations and photo provenance |
+| `photos.js` | Photo resizing, IndexedDB storage and offline photo retrieval |
+| `recipe-import.js` | Shared HTML/JSON recipe parser, image extraction and bounded browser reads |
 | `theme.js` | Day/night spring and colour palette |
 | `app-config.js` | Static hosting defaults; local server serves development settings |
 | `DEPLOY.md` | Quick deployment guide for Actions or the repository root |

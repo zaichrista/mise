@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { extractRecipe, isPublicAddress, parseTarget, importFromUrl, decodeEntities } from '../import-recipe.mjs';
+import RecipeImport from '../recipe-import.js';
 
 const page = (json) => `<html><head><script type="application/ld+json">${json}</script></head><body></body></html>`;
 
@@ -39,6 +40,26 @@ test('returns null when there is no recipe', () => {
   assert.equal(extractRecipe('<html>nothing</html>'), null);
   assert.equal(extractRecipe(page(JSON.stringify({ '@type': 'Article', name: 'x' }))), null);
   assert.equal(extractRecipe(page(JSON.stringify({ '@type': 'Recipe', name: 'Empty' }))), null);
+});
+
+test('saved recipe JSON and HTML keep safe internet images without executing page code', () => {
+  const data = { '@type': 'Recipe', name: 'Soup', image: [{ '@type': 'ImageObject', url: '/soup.jpg' }], recipeIngredient: ['1 tomato'], recipeInstructions: ['Cook it.'] };
+  const source = 'https://example.com/recipes/soup';
+  assert.equal(extractRecipe(JSON.stringify(data), source).image, 'https://example.com/soup.jpg');
+  assert.equal(extractRecipe(page(JSON.stringify(data)), source).image, 'https://example.com/soup.jpg');
+  data.image = 'javascript:alert(1)';
+  assert.equal(extractRecipe(JSON.stringify(data), source).image, '');
+});
+
+test('browser import bounds streaming page size and reads UTF-8 across chunk boundaries', async () => {
+  const bytes = new TextEncoder().encode('Crème brûlée');
+  const response = new Response(new ReadableStream({ start(controller) { controller.enqueue(bytes.slice(0, 3)); controller.enqueue(bytes.slice(3)); controller.close(); } }));
+  assert.equal(await RecipeImport.readPage(response), 'Crème brûlée');
+  await assert.rejects(() => RecipeImport.readPage(new Response('too large', { headers: { 'content-length': String(4 * 1024 * 1024) } })), /too large/);
+  let cancelled = false;
+  const stream = new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(3 * 1024 * 1024 + 1)); }, cancel() { cancelled = true; } });
+  await assert.rejects(() => RecipeImport.readPage(new Response(stream)), /too large/);
+  assert.equal(cancelled, true);
 });
 
 test('decodes entities', () => {

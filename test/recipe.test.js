@@ -77,3 +77,17 @@ test('every step references real ingredients', () => {
   const ids = new Set(R.sample.ingredients.map((i) => i.id));
   for (const s of R.sample.steps) for (const id of s.ingredients) assert.ok(ids.has(id), `${s.id} -> ${id}`);
 });
+
+test('recipe photos preserve provenance through editing and control the completion prompt', () => {
+  for (const photo of [{ source: 'upload', key: 'photo-123' }, { source: 'internet', url: 'https://example.com/recipe.jpg' }]) {
+    const recipe = { ...R.sample, photo };
+    const edited = R.buildRecipe(R.draftFromRecipe(recipe));
+    assert.deepEqual(edited.photo, photo);
+    assert.equal(R.needsPhoto(edited), photo.source !== 'upload');
+  }
+  assert.equal(R.needsPhoto(R.sample), true);
+  assert.equal(R.normalizePhoto({ source: 'internet', url: 'javascript:alert(1)' }), null);
+  assert.equal(R.normalizePhoto({ source: 'upload', key: '' }), null);
+  const imported = R.draftFromImport({ image: 'https://example.com/recipe.jpg', ingredients: ['1 egg'], steps: ['Cook it.'] });
+  assert.equal(imported.photo.source, 'internet');
+});

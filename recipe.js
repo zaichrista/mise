@@ -4,6 +4,7 @@
    Recipe shape:
    {
      id, title, baseServings, time,
+     photo?: { source: 'upload', key } | { source: 'internet', url },
      ingredients: [{ id, name, plural?, qty: number|null, unit: string, whole?, note?, qtyText? }],
      steps: [{ id, title, text, ingredients: [ingredientId], timer?: { label, minutes } }]
    }
@@ -244,14 +245,14 @@
   // A draft is the editable form: plain text lines and steps with optional timer minutes.
   function draftFromRecipe(r) {
     return {
-      id: r.id, title: r.title, baseServings: r.baseServings, time: r.time || '', source: r.source || '',
+      id: r.id, title: r.title, baseServings: r.baseServings, time: r.time || '', source: r.source || '', photo: normalizePhoto(r.photo),
       ingredientsText: r.ingredients.map(ingredientToLine).join('\n'),
       steps: r.steps.map((s) => ({ text: s.title ? `${s.title} ${s.text}`.trim() : s.text, minutes: s.timer ? s.timer.minutes : 0 }))
     };
   }
   function draftFromImport(data) {
     return {
-      id: null, title: data.title || '', baseServings: clampServings(data.servings || 4), time: data.time || '', source: data.source || '',
+      id: null, title: data.title || '', baseServings: clampServings(data.servings || 4), time: data.time || '', source: data.source || '', photo: normalizePhoto({ source: 'internet', url: data.image }),
       ingredientsText: (data.ingredients || []).join('\n'),
       steps: (data.steps || []).map((text) => ({ text, minutes: detectTimer(text) }))
     };
@@ -264,6 +265,14 @@
     if (!d.steps.some((s) => String(s.text).trim())) return 'Add at least one step.';
     return '';
   }
+  function normalizePhoto(photo) {
+    if (photo?.source === 'upload' && typeof photo.key === 'string' && photo.key) return { source: 'upload', key: photo.key };
+    if (photo?.source === 'internet' && typeof photo.url === 'string') {
+      try { const url = new URL(photo.url); if (/^https?:$/.test(url.protocol)) return { source: 'internet', url: url.href }; } catch { /* No usable image. */ }
+    }
+    return null;
+  }
+  const needsPhoto = (r) => normalizePhoto(r.photo)?.source !== 'upload';
   function buildRecipe(d, id) {
     const ingredients = String(d.ingredientsText).split('\n').map((l) => l.trim()).filter(Boolean).map((l, i) => parseIngredient(l, i));
     const steps = d.steps.filter((s) => String(s.text).trim()).map((s, i) => {
@@ -275,6 +284,8 @@
     });
     const r = { id: id || d.id || `r-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, title: String(d.title).trim(), baseServings: clampServings(d.baseServings), time: String(d.time || '').trim(), ingredients, steps };
     if (d.source) r.source = d.source;
+    const photo = normalizePhoto(d.photo);
+    if (photo) r.photo = photo;
     return r;
   }
 
@@ -304,6 +315,6 @@
     ]
   };
 
-  return { MIN_SERVINGS, MAX_SERVINGS, clampServings, scaleIngredient, formatQty, displayIngredient, scaleRecipe, stepIngredients, sample,
+  return { MIN_SERVINGS, MAX_SERVINGS, clampServings, scaleIngredient, formatQty, displayIngredient, scaleRecipe, stepIngredients, sample, normalizePhoto, needsPhoto,
     parseIngredient, ingredientToLine, detectTimer, linkIngredients, draftFromRecipe, draftFromImport, blankDraft, validateDraft, buildRecipe };
 });
