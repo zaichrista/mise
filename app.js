@@ -151,12 +151,14 @@
   }
   function timerBlock(step, s, n) {
     const t = s.timers.find((x) => x.id === step.id);
-    const running = t?.state === 'running';
-    const name = step.timer.label || `Step ${n + 1}`;
-    return `<section class="timer timer-mini" aria-label="${esc(name)} stopwatch">
+    const running = t?.state === 'running', here = n === s.step, suggested = here && !t;
+    const name = step.timer.label || stepLabel(step);
+    const status = suggested ? 'Start for this step' : running ? (here ? 'Running for this step' : `Running · step ${n + 1}`) : t ? `Finished · step ${n + 1}` : n > s.step ? `Step ${n + 1} · later` : `Step ${n + 1} · not started`;
+    return `<section class="timer timer-mini${suggested ? ' is-suggested' : ''}${here ? ' is-current' : ''}" data-timer-step="${n}" aria-label="${esc(name)} stopwatch, ${esc(status)}"${here ? ' aria-current="step"' : ''}>
+      <span class="timer-stage">${esc(status)}</span>
       <button class="timer-name quiet" type="button" data-act="goto" data-step="${n}" title="Go to this step">${esc(name)}</button>
       ${timerDial(step, running ? t : null)}
-      ${running ? `<div class="timer-controls"><button class="soft" type="button" data-act="timer-plus" data-step="${n}" aria-label="Add one minute to ${esc(name)}">+1 min</button><button class="soft" type="button" data-act="timer-stop" data-step="${n}" aria-label="Stop ${esc(name)}">Stop</button></div>` : `<button class="soft timer-start" type="button" data-act="timer-start" data-step="${n}">${icon('play')}${t ? 'Restart' : 'Start'}</button>`}
+      ${running ? `<div class="timer-controls"><button class="soft" type="button" data-act="timer-plus" data-step="${n}" aria-label="Add one minute to ${esc(name)}">+1 min</button><button class="soft" type="button" data-act="timer-stop" data-step="${n}" aria-label="Stop ${esc(name)}">Stop</button></div>` : `<button class="soft timer-start" type="button" data-act="timer-start" data-step="${n}" aria-label="${t ? 'Restart' : 'Start'} ${esc(name)} timer for step ${n + 1}, ${step.timer.minutes} minutes">${icon('play')}${suggested ? 'Start this timer' : t ? 'Restart' : n > s.step ? 'Start early' : 'Start'}</button>`}
     </section>`;
   }
 
@@ -166,6 +168,8 @@
     const bars = r.steps.map((_, i) => `<span class="${i <= s.step ? 'on' : ''}${i === s.step ? ' current' : ''}"></span>`).join('');
     const ingredients = R.scaleRecipe(r, s.servings).map((item) => `<div class="row${(step.ingredients || []).includes(item.id) ? ' is-needed' : ''}"><span>${esc(item.name)}${item.note ? ` <small>· ${esc(item.note)}</small>` : ''}</span><strong>${esc(item.qty)}</strong></div>`).join('');
     const timers = r.steps.map((timedStep, n) => timedStep.timer ? timerBlock(timedStep, s, n) : '').join('');
+    const stepTimer = step.timer && s.timers.find((t) => t.id === step.id);
+    const timerCue = step.timer && !stepTimer ? `<p class="step-timer-cue">${icon('timer')}Start the highlighted <strong>${esc(step.timer.label || stepLabel(step))}</strong> timer above for ${step.timer.minutes} min.</p>` : stepTimer?.state === 'running' ? `<p class="step-timer-cue">${icon('circle-check')}Your ${esc(step.timer.label || stepLabel(step))} timer is running above.</p>` : '';
     return `
       <header class="top"><button class="quiet-btn" type="button" data-act="exit">${icon('chevron-left')}Recipe</button><span class="count">Step ${s.step + 1} of ${r.steps.length}</span></header>
       <div class="bars" role="img" aria-label="Step ${s.step + 1} of ${r.steps.length}">${bars}</div>
@@ -179,6 +183,7 @@
           <div class="instruction-stage"><div class="step-copy" tabindex="-1">
             <div class="eyebrow">Step ${s.step + 1} of ${r.steps.length}</div>
             ${step.title ? `<h1>${esc(step.title)}</h1><p class="lede">${esc(step.text)}</p>` : `<p class="lede big">${esc(step.text)}</p>`}
+            ${timerCue}
           </div></div>
           <footer class="cook-actions">
             <div class="nav"><button class="back" type="button" data-act="back" aria-label="Previous step"${s.step === 0 ? ' disabled' : ''}>${icon('arrow-left')}</button>${mainButton('next', last ? 'check' : 'arrow-right', last ? 'Finish' : 'Next', next ? stepLabel(next) : '')}</div>
@@ -285,6 +290,9 @@
   // render() draws from state only. Anything that changes state first calls syncFromDom() so typed text isn't lost.
   let lastView = { screen: null, recipe: null, step: null };
   function render(cause = '') {
+    // Capture the visible size, including an interrupted animation, before drawing.
+    const timerPositions = new Map([...root.querySelectorAll('.timer[data-timer-step] .timer-dial')].map((dial) => [dial.closest('.timer').dataset.timerStep, dial.getBoundingClientRect()]));
+    const timerScroll = root.querySelector('.cook-timers')?.scrollLeft || 0;
     const active = document.activeElement;
     const focusKey = active && root.contains(active) && active.dataset.act ? `[data-act="${active.dataset.act}"]` : null;
     const r = current();
@@ -326,6 +334,24 @@
       if (!button.closest('.servings')) button.classList.add('sponge');
     });
     if (globalThis.lucide) lucide.createIcons({ attrs: { width: 24, height: 24 } });
+    const timerStrip = root.querySelector('.cook-timers');
+    if (timerStrip) {
+      timerStrip.scrollLeft = timerScroll;
+      const suggested = timerStrip.querySelector('.is-suggested');
+      if (suggested) {
+        const bounds = timerStrip.getBoundingClientRect(), target = suggested.getBoundingClientRect();
+        if (target.left < bounds.left || target.right > bounds.right) timerStrip.scrollLeft += (target.left + target.right - bounds.left - bounds.right) / 2;
+      }
+      if (!reducedMotion.matches) root.querySelectorAll('.timer[data-timer-step] .timer-dial').forEach((dial) => {
+        const before = timerPositions.get(dial.closest('.timer').dataset.timerStep), after = dial.getBoundingClientRect();
+        if (!before || !after.width || !dial.animate) return;
+        if (Math.abs(before.width - after.width) < .5 && Math.abs(before.left - after.left) < .5 && Math.abs(before.top - after.top) < .5) return;
+        dial.animate([
+          { transformOrigin: '0 0', transform: `translate(${before.left - after.left}px, ${before.top - after.top}px) scale(${before.width / after.width})` },
+          { transformOrigin: '0 0', transform: 'translate(0, 0) scale(1)' }
+        ], { duration: 360, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      });
+    }
     const wanted = state.focus && root.querySelector(state.focus);
     const target = root.querySelector('[data-autofocus]') || wanted || (focusKey && root.querySelector(focusKey));
     target?.focus({ preventScroll: !wanted });
@@ -628,7 +654,6 @@
     save();
     if (b.dataset.act.startsWith('servings-')) { updateServings(b.dataset.act === 'servings-up' ? 1 : -1); return; }
     render(b.dataset.act);
-    if (b.dataset.act === 'timer-start') root.querySelector(`[data-timer-ring="${current().steps[b.dataset.step ?? sessionOf(current()).step].id}"]`)?.closest('.timer-dial')?.classList.add('just-started');
   });
   // Arrow keys step through the recipe (not while the timer alert is up).
   document.addEventListener('keydown', (e) => {

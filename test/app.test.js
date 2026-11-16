@@ -115,6 +115,31 @@ test('cooking separates ingredients and method, and stopwatches control their ow
   assert.deepEqual(app.saved().sessions[Recipe.sample.id].timers.map((t) => t.id), ['sauce']);
 });
 
+test('the current unstarted timer is highlighted, then returns to compact running status', () => {
+  const app = setup(saved('cook'));
+  const section = (n) => app.root.html.match(new RegExp(`<section class="timer [^"]*" data-timer-step="${n}"[\\s\\S]*?</section>`))[0];
+  assert.match(section(1), /is-suggested/);
+  assert.match(section(1), /Start this timer/);
+  assert.match(section(5), /Step 6 · later/);
+  assert.doesNotMatch(section(5), /is-suggested/);
+  assert.match(app.root.html, /Start the highlighted/);
+  app.click('timer-start', { step: '1' });
+  assert.doesNotMatch(section(1), /is-suggested/);
+  assert.match(section(1), /Running for this step/);
+  assert.match(app.root.html, /Your Sauce timer is running above/);
+  app.click('next');
+  assert.match(section(1), /Running · step 2/);
+  assert.doesNotMatch(app.root.html, /is-suggested/);
+  app.click('goto', { step: '5' });
+  assert.match(section(5), /is-suggested/);
+  assert.match(section(5), /Start this timer/);
+  assert.doesNotMatch(section(1), /is-suggested/);
+  app.click('timer-start', { step: '5' });
+  assert.doesNotMatch(section(5), /is-suggested/);
+  const restored = setup(app.saved());
+  assert.doesNotMatch(restored.root.html, /is-suggested/);
+});
+
 test('completion photo prompt depends on provenance, and can be skipped', () => {
   for (const [photo, expected] of [[undefined, true], [{ source: 'internet', url: 'https://example.com/food.jpg' }, true], [{ source: 'upload', key: 'my-photo' }, false]]) {
     const app = setup(saved('done'), { recipe: { ...Recipe.sample, photo } });
