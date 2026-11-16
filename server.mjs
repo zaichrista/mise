@@ -13,6 +13,9 @@ const contentTypes = {
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.md': 'text/plain; charset=utf-8',
+  '.webmanifest': 'application/manifest+json',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
 };
 
 const allowedHosts = new Set([`127.0.0.1:${previewPort}`, `localhost:${previewPort}`]);
@@ -42,6 +45,11 @@ const server = createServer(async (request, response) => {
 
   try {
     const parsed = new URL(request.url, 'http://localhost');
+    if (parsed.pathname === '/app-config.js') {
+      response.writeHead(200, { 'Content-Type': contentTypes['.js'], 'Cache-Control': 'no-store' });
+      response.end(request.method === 'HEAD' ? undefined : "window.CookConfig = { importEndpoint: './api/import', offline: false };\n");
+      return;
+    }
     if (parsed.pathname === '/api/import') return await handleImport(request, parsed, response);
     const pathname = decodeURIComponent(parsed.pathname);
     const requestedFile = pathname === '/' ? 'index.html' : pathname.slice(1);
@@ -74,6 +82,6 @@ server.on('error', (error) => {
 });
 
 server.listen(previewPort, '127.0.0.1', () => {
-  console.log(`Cook Mode preview: http://127.0.0.1:${previewPort}`);
+  console.log(`Pot & Page preview: http://127.0.0.1:${previewPort}`);
   console.log('Press Ctrl+C to stop. Refresh your browser after saving an edit.');
 });

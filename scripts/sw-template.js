@@ -1,0 +1,25 @@
+// The build replaces both placeholders with a content hash and explicit asset list.
+const CACHE = 'pot-and-page-__BUILD_VERSION__';
+const ASSETS = __PRECACHE_ASSETS__;
+const base = new URL('./', self.location.href);
+const urls = new Set(ASSETS.map((path) => new URL(path, base).href));
+const cachePrefix = `pot-and-page:${base.pathname}:`;
+const cacheName = cachePrefix + CACHE;
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll([...urls])));
+});
+self.addEventListener('activate', (event) => {
+  event.waitUntil(caches.keys().then((keys) => Promise.all(
+    keys.filter((key) => key.startsWith(cachePrefix) && key !== cacheName).map((key) => caches.delete(key))
+  )));
+});
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== base.origin) return;
+  const home = event.request.mode === 'navigate' && (url.pathname === base.pathname || url.pathname === new URL('index.html', base).pathname);
+  const key = home ? new URL('index.html', base).href : url.href;
+  if (!urls.has(key)) return; // Never cache API calls or unrelated sites on the same origin.
+  event.respondWith(caches.open(cacheName).then(async (cache) => (await cache.match(key)) || fetch(event.request)));
+});

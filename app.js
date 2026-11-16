@@ -1,8 +1,10 @@
-/* Mise: a recipe library, a recipe editor/importer, and a minimal cooking screen.
+/* Pot & Page: a recipe library, a recipe editor/importer, and a cooking screen.
    Screens: library -> recipe -> cook -> done, plus edit and import. */
 (() => {
   const R = Recipe;
   const root = document.getElementById('app');
+  const importEndpoint = window.CookConfig?.importEndpoint;
+  // Keep the original storage keys so existing recipes and progress survive the rename.
   const RECIPES_KEY = 'mise-recipes-v1';
   const APP_KEY = 'mise-app-v3';
 
@@ -73,7 +75,7 @@
       return `<button class="card" type="button" data-act="open" data-id="${esc(r.id)}"><span class="card-title">${esc(r.title)}</span><span class="card-meta">${meta}</span>${icon('chevron-right')}</button>`;
     }).join('');
     return `
-      <header class="top"><span class="brand">mise.</span></header>
+      <header class="top"><span class="brand">pot &amp; page.</span></header>
       <main class="body">
         <div class="eyebrow">Recipes</div>
         <h1>What are we cooking?</h1>
@@ -81,7 +83,8 @@
       </main>
       <footer class="foot">
         ${mainButton('new', 'pen-line', 'Write a recipe')}
-        <button class="soft wide" type="button" data-act="import">${icon('link')}Import from a link</button>
+        <button class="soft wide" type="button" data-act="${importEndpoint ? 'import' : 'new'}">${icon(importEndpoint ? 'link' : 'clipboard-pen')}${importEndpoint ? 'Import from a link' : 'Paste a recipe'}</button>
+        <details class="install-help"><summary>Keep Pot &amp; Page close</summary><p>On iPhone or iPad, open this site in Safari, then choose Share → Add to Home Screen. On Android or desktop, look for Install in your browser’s menu.</p><p>Your recipes stay in this browser. After your first online visit, the installed app also works offline.</p></details>
       </footer>`;
   }
 
@@ -186,7 +189,7 @@
 
   function doneView(r) {
     return `
-      <header class="top"><span class="brand">mise.</span></header>
+      <header class="top"><span class="brand">pot &amp; page.</span></header>
       <main class="body center">
         ${kitchenArt('dish')}
         <div class="eyebrow">${esc(r.title)}</div>
@@ -407,10 +410,12 @@
     const url = state.url.trim();
     state.error = '';
     if (!url) { state.error = 'Paste a link first.'; return; }
-    if (location.protocol === 'file:') { state.error = 'Importing needs the local server. Run “npm start”, then open http://127.0.0.1:5173.'; return; }
+    if (!importEndpoint || location.protocol === 'file:') { state.error = 'Link importing needs the local server. You can write or paste a recipe instead.'; return; }
     state.busy = true; render();
     try {
-      const res = await fetch('/api/import?url=' + encodeURIComponent(url));
+      const endpoint = new URL(importEndpoint, location.href);
+      endpoint.searchParams.set('url', url);
+      const res = await fetch(endpoint);
       const data = await res.json().catch(() => null);
       if (!data?.ok) throw new Error(data?.error || 'Couldn’t import that page.');
       state.draft = R.draftFromImport(data.recipe);
