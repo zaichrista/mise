@@ -68,7 +68,8 @@
   function photoImage(item, extra = '') {
     const photo = R.normalizePhoto(item.photo);
     if (!photo) return '';
-    return `<figure class="recipe-photo ${extra}"><img ${photo.source === 'upload' ? `data-photo-key="${esc(photo.key)}"` : `src="${esc(photo.url)}"`} alt="${esc(item.title || 'Recipe')}" loading="lazy" referrerpolicy="no-referrer"><span class="photo-fallback">Photo unavailable. You can add another one.</span></figure>`;
+    const card = extra === 'card-photo', tag = card ? 'span' : 'figure';
+    return `<${tag} class="recipe-photo ${extra}"><img ${photo.source === 'upload' ? `data-photo-key="${esc(photo.key)}"` : `src="${esc(photo.url)}"`} alt="${esc(item.title || 'Recipe')}" loading="lazy" referrerpolicy="no-referrer"><span class="photo-fallback">${card ? "don't forget a pic!" : 'Photo unavailable. You can add another one.'}</span></${tag}>`;
   }
   function photoControls() {
     return `<div class="photo-actions"><button class="soft" type="button" data-act="photo-camera"${state.photoBusy ? ' disabled' : ''}>${icon('camera')}Take a photo</button><button class="soft" type="button" data-act="photo-library"${state.photoBusy ? ' disabled' : ''}>${icon('image-plus')}Photo library</button></div>${state.photoBusy ? '<p class="quiet-text" role="status">Saving your photo…</p>' : ''}${state.photoError ? `<p class="error" role="alert">${esc(state.photoError)}</p>` : ''}`;
@@ -82,7 +83,8 @@
     const cards = recipes.map((r) => {
       const s = sessions[r.id];
       const meta = inProgress(r) ? `<span class="live">Cooking · step ${s.step + 1} of ${r.steps.length}</span>` : `${r.ingredients.length} ingredients${r.time ? ` · ${esc(r.time)}` : ''}`;
-      return `<button class="card" type="button" data-act="open" data-id="${esc(r.id)}">${photoImage(r, 'card-photo')}<span class="card-title">${esc(r.title)}</span><span class="card-meta">${meta}</span>${icon('chevron-right')}</button>`;
+      const image = photoImage(r, 'card-photo') || `<span class="card-photo card-photo-placeholder">${icon('camera')}<span>don't forget a pic!</span></span>`;
+      return `<button class="card" type="button" data-act="open" data-id="${esc(r.id)}" aria-label="Open ${esc(r.title)}">${image}<span class="card-content"><span class="card-title">${esc(r.title)}</span><span class="card-meta">${meta}</span>${icon('chevron-right')}</span></button>`;
     }).join('');
     return `
       <header class="top"><span class="brand">pot &amp; page.</span></header>
