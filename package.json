@@ -1,0 +1,11 @@
+{
+  "name": "mise-cook-mode-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Editable tablet Cook Mode visual prototype",
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check app.js && node --check theme.js && node --check recipe.js && node --check import-recipe.mjs && node --check server.mjs",
+    "test": "node --test test/"
+  }
+}

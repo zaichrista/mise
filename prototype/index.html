@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Editable Cook Mode design prototype for iPad and larger screens. Timers and voice controls are demonstrations.">
+  <title>Mise · Cook Mode design prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="../vendor/lucide.js"></script>
+  <script defer src="../recipe.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<div id="cook-concepts">
+  <div class="preview-controls">
+    <label class="form-label" for="cook-screen">Screen
+      <select class="form-select" id="cook-screen">
+        <option value="preparing">Preparing</option><option value="active" selected>Active cooking</option><option value="waiting">Waiting</option><option value="parallel">Parallel tasks</option><option value="checkpoint">Checkpoint</option><option value="interrupted">Timer interruption</option><option value="recovery">Recovery</option><option value="finishing">Finishing</option><option value="completed">Completed</option>
+      </select>
+    </label>
+    <label class="form-label" for="cook-direction">Design
+      <select class="form-select" id="cook-direction">
+        <option value="journal">Recipe journal</option>
+        <option value="counter">Counter focus</option>
+      </select>
+    </label>
+    <label class="form-label" for="cook-shape">Main button
+      <select class="form-select" id="cook-shape">
+        <option>Rounded square</option><option>Circle</option>
+      </select>
+    </label>
+    <span class="text-small text-muted">iPad & larger screens · illustrative timers</span>
+  </div>
+  <div class="preview-area" aria-label="Cook Mode design directions">
+    <section data-variant="Recipe journal" aria-label="Recipe journal design">
+      <div class="cm-stage"><article class="cm-app cm-journal" id="cm-journal" aria-label="Recipe journal Cook Mode"></article></div>
+    </section>
+    <section data-variant="Counter focus" aria-label="Counter focus design" hidden>
+      <div class="cm-stage"><article class="cm-app cm-counter" id="cm-counter" aria-label="Counter focus Cook Mode"></article></div>
+    </section>
+  </div>
+  <p class="sr-only" id="cm-update" aria-live="polite"></p>
+</div>
+  <noscript>This prototype needs JavaScript to display its cooking screens. Enable JavaScript and reopen this page.</noscript>
+</body>
+</html>

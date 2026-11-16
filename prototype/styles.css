@@ -1,0 +1,184 @@
+/* Preview controls live outside the cooking interface. No framework required. */
+:root { color-scheme: light dark; }
+body {
+  margin: 0;
+  padding: 24px;
+  background: light-dark(#f0f0e9, #191e19);
+  color: light-dark(#292d25, #f1eee5);
+  font: 16px/1.5 Arial, sans-serif;
+}
+#cook-concepts { max-width: 1280px; margin: 0 auto; }
+.preview-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; padding-bottom: 12px; }
+.form-label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.form-select {
+  font: inherit;
+  font-size: 16px;
+  color: inherit;
+  background: light-dark(#fbf8f0, #24251f);
+  border: 1px solid light-dark(#b9bdb0, #606958);
+  border-radius: 10px;
+  padding: 12px 36px 12px 12px;
+  min-height: 48px;
+  max-width: 100%;
+}
+.text-small { font-size: 13px; }
+.text-muted { color: light-dark(#62665b, #bdc4b4); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+[hidden] { display: none !important; }
+.cursor-interaction { cursor: pointer; }
+svg.lucide { display: inline-block; vertical-align: middle; stroke-width: 1.5; }
+button:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid light-dark(#315f95, #b3d2ff); outline-offset: 4px; }
+@media (max-width: 660px) { body { padding: 12px; } .preview-controls { gap: 12px; } }
+
+/* Product styles: base rules, followed by the current iPad layout. */
+#cook-concepts { color-scheme: light dark; }
+#cook-concepts .cm-stage { min-height: 840px; display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; box-sizing:border-box; }
+#cook-concepts .cm-app { --cm-paper:light-dark(#fbf8f0,#24251f); --cm-ink:light-dark(#292d25,#f1eee5); --cm-muted:light-dark(#666a5c,#bbbeb0); --cm-line:light-dark(#dbddce,#484c40); --cm-soft:light-dark(#efeee2,#33372d); --cm-accent:light-dark(#713f46,#e7b7bb); --cm-on:light-dark(#fff9f0,#352126); --cm-alert:light-dark(#805320,#edc68b); --cm-alert-bg:light-dark(#f4e9d4,#3e3324); background:var(--cm-paper); color:var(--cm-ink); width:100%; max-width:432px; min-height:786px; box-sizing:border-box; border:1px solid var(--cm-line); border-radius:28px; font-family:Arial, sans-serif; font-size:16px; line-height:1.5; padding:26px; display:flex; flex-direction:column; overflow-wrap:anywhere; box-shadow:0 12px 36px light-dark(#292d2510,#00000020); }
+#cook-concepts .cm-app * { box-sizing:border-box; }
+#cook-concepts .cm-app h1,#cook-concepts .cm-app h2,#cook-concepts .cm-app h3,#cook-concepts .cm-app p { margin:0; }
+#cook-concepts .cm-app button { font:inherit; cursor:pointer; touch-action:manipulation; }
+#cook-concepts .cm-app button:disabled { opacity:.5; cursor:default; }
+#cook-concepts .cm-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:22px; border-bottom:1px solid var(--cm-line); }
+#cook-concepts .cm-brand { font-family:Georgia,serif; font-style:italic; font-size:24px; letter-spacing:-1px; }
+#cook-concepts .cm-mode { padding:7px 12px; border-radius:24px; background:transparent; border:1px solid var(--cm-line); color:var(--cm-ink); font-size:12px !important; min-height:38px; display:flex; gap:6px; align-items:center; }
+#cook-concepts .cm-identity { padding:21px 0 19px; display:flex; justify-content:space-between; align-items:center; gap:10px; color:var(--cm-muted); font-size:12px; }
+#cook-concepts .cm-identity strong { font-weight:500; color:var(--cm-ink); }
+#cook-concepts .cm-body { flex:1; }
+#cook-concepts .cm-eyebrow { text-transform:uppercase; font-size:11px; letter-spacing:1.7px; font-weight:500; color:var(--cm-accent); display:flex; align-items:center; gap:8px; margin-bottom:13px; }
+#cook-concepts .cm-app h1 { font-family:Georgia,serif; font-weight:400; font-size:42px; letter-spacing:-1.4px; line-height:1.07; margin-bottom:19px; }
+#cook-concepts .cm-description { font-size:16px; line-height:1.65; max-width:32ch; }
+#cook-concepts .cm-quiet { font-size:12px; color:var(--cm-muted); }
+#cook-concepts .cm-label { font-size:11px; letter-spacing:1.2px; text-transform:uppercase; font-weight:500; color:var(--cm-muted); }
+#cook-concepts .cm-section { margin-top:26px; }
+#cook-concepts .cm-ingredient { display:flex; justify-content:space-between; gap:18px; padding:11px 0; border-bottom:1px solid var(--cm-line); font-size:15px; }
+#cook-concepts .cm-ingredient strong { font-weight:500; white-space:nowrap; }
+#cook-concepts .cm-ingredient small { color:var(--cm-muted); font-size:12px; }
+#cook-concepts .cm-cue { display:flex; gap:11px; align-items:flex-start; margin-top:22px; padding-left:13px; border-left:2px solid var(--cm-accent); font-size:14px; }
+#cook-concepts .cm-running { border-radius:15px; padding:15px 17px; background:var(--cm-soft); margin-top:23px; }
+#cook-concepts .cm-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+#cook-concepts .cm-running strong { font-weight:500; font-size:15px; }
+#cook-concepts .cm-time { font-variant-numeric:tabular-nums; font-size:21px; letter-spacing:-.5px; }
+#cook-concepts .cm-track { height:3px; background:var(--cm-line); border-radius:3px; margin-top:13px; overflow:hidden; }
+#cook-concepts .cm-track span { display:block; width:42%; height:100%; background:var(--cm-accent); }
+#cook-concepts .cm-footer { padding-top:24px; }
+#cook-concepts .cm-upnext { display:flex; align-items:baseline; gap:10px; margin-bottom:15px; font-size:12px; color:var(--cm-muted); }
+#cook-concepts .cm-primary,#cook-concepts .cm-secondary,#cook-concepts .cm-link { min-height:48px; display:flex; align-items:center; justify-content:center; gap:9px; border:0; }
+#cook-concepts .cm-primary { width:100%; background:var(--cm-accent); color:var(--cm-on); border-radius:26px; padding:13px 18px; font-weight:500; }
+#cook-concepts .cm-secondary { background:transparent; color:var(--cm-ink); border:1px solid var(--cm-line); border-radius:24px; padding:10px 16px; }
+#cook-concepts .cm-link { color:var(--cm-muted); background:transparent; padding:8px 0; font-size:12px !important; }
+#cook-concepts .cm-tools { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:14px; }
+#cook-concepts .cm-app svg { flex-shrink:0; }
+#cook-concepts .cm-suggestion { margin-top:25px; border-top:1px solid var(--cm-line); padding-top:19px; }
+#cook-concepts .cm-suggestion h3 { font:400 24px/1.2 Georgia,serif; margin-top:8px; margin-bottom:15px; }
+#cook-concepts .cm-actions { display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
+#cook-concepts .cm-actions > .cm-primary { width:auto; flex:1; }
+#cook-concepts .cm-clock { font-family:Georgia,serif; font-size:75px; letter-spacing:-4px; line-height:1.15; margin:25px 0 2px; font-variant-numeric:tabular-nums; }
+#cook-concepts .cm-panel { background:var(--cm-soft); border-radius:17px; padding:18px; margin-top:22px; }
+#cook-concepts .cm-panel h3 { font:400 23px/1.25 Georgia,serif; margin:8px 0; }
+#cook-concepts .cm-smallrow { display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid var(--cm-line); }
+#cook-concepts .cm-smallrow > div { flex:1; }
+#cook-concepts .cm-smallrow b { font-weight:500; font-size:15px; }
+#cook-concepts .cm-smallrow .cm-quiet { margin-top:2px; }
+#cook-concepts .cm-alert { background:var(--cm-alert-bg); border-radius:18px; padding:23px; margin:0 -7px 19px; color:var(--cm-ink); }
+#cook-concepts .cm-alert .cm-eyebrow { color:var(--cm-alert); }
+#cook-concepts .cm-alert h1 { font-size:35px; }
+#cook-concepts .cm-alert .cm-primary { background:var(--cm-alert); color:var(--cm-paper); }
+#cook-concepts .cm-app details { margin-top:18px; font-size:13px; }
+#cook-concepts .cm-app summary { min-height:38px; padding:8px 0; color:var(--cm-muted); cursor:pointer; }
+#cook-concepts .cm-notice { margin-top:12px; padding:12px 0; font-size:13px; color:var(--cm-muted); }
+#cook-concepts .cm-complete { text-align:center; padding:28px 0 16px; }
+#cook-concepts .cm-complete > i,#cook-concepts .cm-complete > svg { margin-bottom:24px; color:var(--cm-accent); }
+#cook-concepts .cm-complete h1 { font-size:47px; }
+#cook-concepts .cm-complete .cm-description { margin:auto; }
+#cook-concepts .cm-prepmeta { display:flex; gap:22px; padding:18px 0; border-bottom:1px solid var(--cm-line); }
+#cook-concepts .cm-prepmeta span { display:flex; align-items:center; gap:6px; font-size:13px; }
+#cook-concepts .cm-counter { --cm-paper:light-dark(#f5f6f0,#1c2924); --cm-soft:light-dark(#e5eade,#2d3e34); --cm-ink:light-dark(#243b2d,#eff4e9); --cm-muted:light-dark(#5d6e61,#b1c2b5); --cm-line:light-dark(#ccd6c7,#43584a); --cm-accent:light-dark(#345c42,#bed7aa); --cm-on:light-dark(#f7faef,#203424); border-radius:12px; padding:25px; }
+#cook-concepts .cm-counter .cm-brand { font:500 17px/1.3 Arial,sans-serif; letter-spacing:-.5px; }
+#cook-concepts .cm-counter .cm-top { padding-bottom:16px; }
+#cook-concepts .cm-counter .cm-identity { padding:20px 0 28px; }
+#cook-concepts .cm-counter h1 { font-family:Arial,sans-serif; font-weight:500; font-size:44px; letter-spacing:-2px; line-height:1.08; margin-bottom:23px; }
+#cook-concepts .cm-counter .cm-eyebrow { letter-spacing:1px; }
+#cook-concepts .cm-counter .cm-description { font-size:18px; line-height:1.6; }
+#cook-concepts .cm-counter .cm-primary { border-radius:10px; min-height:58px; }
+#cook-concepts .cm-counter .cm-secondary { border-radius:10px; }
+#cook-concepts .cm-counter .cm-running { border-radius:8px; margin:0 0 25px; padding:13px 16px; }
+#cook-concepts .cm-counter .cm-running .cm-track { display:none; }
+#cook-concepts .cm-counter .cm-ingredient { background:var(--cm-soft); border:0; padding:12px; margin-bottom:5px; border-radius:6px; }
+#cook-concepts .cm-counter .cm-clock { font:500 76px/1.15 Arial,sans-serif; letter-spacing:-5px; margin-top:20px; }
+#cook-concepts .cm-counter .cm-panel { border-radius:8px; }
+#cook-concepts .cm-counter .cm-panel h3,#cook-concepts .cm-counter .cm-suggestion h3 { font-family:Arial,sans-serif; font-size:23px; font-weight:500; letter-spacing:-.7px; }
+#cook-concepts .cm-counter .cm-alert { border-radius:10px; }
+#cook-concepts .cm-counter .cm-alert h1 { font-size:37px; }
+#cook-concepts .cm-counter .cm-footer { border-top:1px solid var(--cm-line); margin-top:26px; padding-top:20px; }
+@media(max-width:480px){#cook-concepts .cm-stage{padding:15px 4px;min-height:860px}#cook-concepts .cm-app{padding:21px;min-height:820px;border-radius:20px}#cook-concepts .cm-app h1{font-size:37px}#cook-concepts .cm-counter h1{font-size:39px}#cook-concepts .cm-identity{gap:6px}#cook-concepts .cm-prepmeta{gap:15px}}
+@media(pointer:coarse){#cook-concepts .cm-link,#cook-concepts .cm-mode{min-height:44px}}
+
+/* Tablet cooking surface with generous, separate tap zones. */
+#cook-concepts .cm-stage { min-height:780px; padding:16px 0; }
+#cook-concepts .cm-app { max-width:none; min-height:740px; display:grid; grid-template-columns:minmax(0,1fr) 224px; grid-template-rows:auto auto 1fr; column-gap:44px; padding:32px 36px; border-radius:24px; box-shadow:none; }
+#cook-concepts .cm-top,#cook-concepts .cm-identity { grid-column:1 / -1; }
+#cook-concepts .cm-top { padding-bottom:20px; }
+#cook-concepts .cm-brand { font-size:30px; }
+#cook-concepts .cm-identity { font-size:15px; padding:24px 0 30px; }
+#cook-concepts .cm-body { min-width:0; }
+#cook-concepts .cm-app h1 { font-size:clamp(40px,5.8vw,60px); line-height:1.06; letter-spacing:-1.8px; margin-bottom:24px; }
+#cook-concepts .cm-description,#cook-concepts .cm-counter .cm-description { font-size:20px; line-height:1.6; }
+#cook-concepts .cm-eyebrow { font-size:12px; }
+#cook-concepts .cm-label { font-size:12px; }
+#cook-concepts .cm-quiet { font-size:14px; }
+#cook-concepts .cm-ingredient { font-size:19px; padding:16px 0; }
+#cook-concepts .cm-cue { font-size:16px; margin-top:26px; }
+#cook-concepts .cm-running { padding:20px; margin-top:28px; }
+#cook-concepts .cm-running strong { font-size:17px; }
+#cook-concepts .cm-time { font-size:29px; }
+#cook-concepts .cm-footer,#cook-concepts .cm-counter .cm-footer { grid-column:2; grid-row:3; padding:0 0 0 24px; margin:0; border:0; border-left:1px solid var(--cm-line); display:flex; flex-direction:column; align-items:center; gap:20px; }
+#cook-concepts .cm-primary,#cook-concepts .cm-counter .cm-primary { width:196px; height:196px; min-height:196px; flex:none; flex-direction:column; border-radius:var(--cm-action-radius,28px); padding:22px; gap:12px; text-align:center; }
+#cook-concepts .cm-action-title { font-size:28px; line-height:1.1; font-weight:500; }
+#cook-concepts .cm-action-detail { font-size:14px; line-height:1.35; max-width:14ch; }
+#cook-concepts .cm-primary svg { width:30px; height:30px; }
+#cook-concepts .cm-secondary,#cook-concepts .cm-counter .cm-secondary { width:124px; min-height:124px; flex:none; flex-direction:column; border-radius:22px; padding:17px; text-align:center; line-height:1.4; }
+#cook-concepts .cm-link { min-width:76px; min-height:76px; max-width:164px; flex-direction:column; border-radius:18px; background:var(--cm-soft); padding:12px; font-size:14px !important; line-height:1.4; text-align:center; }
+#cook-concepts .cm-mode { width:76px; min-height:76px; padding:12px; flex-direction:column; border-radius:20px; }
+#cook-concepts .cm-tools { display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:0; width:100%; margin-top:auto; }
+#cook-concepts .cm-tools .cm-link { width:100%; min-width:0; min-height:92px; }
+#cook-concepts .cm-upnext { order:2; display:flex; flex-direction:column; align-items:center; gap:7px; font-size:14px; text-align:center; margin:0; }
+#cook-concepts .cm-upnext > span:first-child { font-size:11px; letter-spacing:1.3px; }
+#cook-concepts .cm-tools { order:3; }
+#cook-concepts .cm-actions { gap:18px; align-items:flex-start; }
+#cook-concepts .cm-actions > .cm-primary { width:152px; height:152px; min-height:152px; flex:none; padding:16px; }
+#cook-concepts .cm-actions .cm-action-title { font-size:23px; }
+#cook-concepts .cm-footer > .cm-actions { justify-content:center; gap:14px; }
+#cook-concepts .cm-footer > .cm-actions > button { width:88px; min-width:0; min-height:88px; padding:12px; }
+#cook-concepts .cm-panel { margin-top:26px; }
+#cook-concepts .cm-alert { padding:26px; margin:0 0 25px; }
+#cook-concepts .cm-alert .cm-primary { width:172px; height:172px; min-height:172px; }
+#cook-concepts .cm-alert .cm-link { margin-top:18px; }
+#cook-concepts .cm-alert h1,#cook-concepts .cm-counter .cm-alert h1 { font-size:44px; }
+#cook-concepts .cm-smallrow b { font-size:18px; }
+#cook-concepts .cm-app summary { font-size:15px; min-height:52px; }
+#cook-concepts .cm-notice { font-size:15px; }
+#cook-concepts .cm-clock,#cook-concepts .cm-counter .cm-clock { font-size:88px; }
+#cook-concepts .cm-counter { border-radius:24px; }
+#cook-concepts .cm-counter .cm-top { padding-bottom:20px; }
+#cook-concepts .cm-counter .cm-identity { padding:24px 0 30px; }
+#cook-concepts .cm-counter h1 { font-size:clamp(40px,5.8vw,60px); }
+#cook-concepts .cm-counter .cm-running { padding:20px; margin:0 0 28px; }
+@media(max-width:660px){
+ #cook-concepts .cm-stage { min-height:1000px; }
+ #cook-concepts .cm-app { grid-template-columns:minmax(0,1fr); padding:24px; gap:0; min-height:960px; }
+ #cook-concepts .cm-footer,#cook-concepts .cm-counter .cm-footer { grid-column:1; grid-row:auto; border-left:0; border-top:1px solid var(--cm-line); margin-top:28px; padding:25px 0 0; }
+ #cook-concepts .cm-tools { width:196px; margin-top:0; }
+ #cook-concepts .cm-app h1,#cook-concepts .cm-counter h1 { font-size:42px; }
+ #cook-concepts .cm-description,#cook-concepts .cm-counter .cm-description { font-size:18px; }
+ #cook-concepts .cm-actions { gap:12px; }
+ #cook-concepts .cm-actions > .cm-primary { width:136px; height:136px; min-height:136px; }
+ #cook-concepts .cm-secondary,#cook-concepts .cm-counter .cm-secondary { width:108px; min-height:108px; padding:12px; }
+ #cook-concepts .cm-alert { padding:18px; }
+ #cook-concepts .cm-alert h1,#cook-concepts .cm-counter .cm-alert h1 { font-size:36px; }
+}
+
+/* Servings stepper (Preparing screen). Large targets, quiet styling. */
+#cook-concepts .cm-servings { gap:12px !important; }
+#cook-concepts .cm-servings b { font-size:15px; min-width:92px; text-align:center; font-weight:600; }
+#cook-concepts .cm-step { width:52px; height:52px; border-radius:50%; border:1px solid var(--cm-line); background:var(--cm-soft); color:var(--cm-ink); display:flex; align-items:center; justify-content:center; padding:0; }
+#cook-concepts .cm-step:disabled { opacity:.35; cursor:default; }
